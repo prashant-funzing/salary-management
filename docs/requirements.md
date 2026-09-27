@@ -1,0 +1,21 @@
+# ACME salary management — requirements
+
+## Goal and user
+Enable ACME's HR managers to manage compensation for 10,000 employees across countries and answer questions about compensation without maintaining spreadsheets. Build a Rails backend, React.js UI, and PostgreSQL database.
+
+## Scope and features
+- **Employee directory:** Search, paginate, and filter employees by country, department, level, and status; create and edit employee records with unique employee identifiers.
+- **Compensation:** Record annual CTC and named components such as Basic, HRA, and Special Allowance. Store an ISO currency code on each compensation version. Components must sum to annual CTC; component names can vary across countries without imposing an India-specific structure everywhere.
+- **Annual and monthly views:** Show annual and monthly totals and component amounts. Annual amounts are authoritative; monthly equivalents are derived by dividing by 12, with explicit currency-aware rounding. Example: INR 12,00,000 annual CTC corresponds to INR 1,00,000 monthly CTC. Monthly equivalents describe compensation, not take-home pay. Use exact decimal arithmetic, never floating-point money. Any display rounding difference must be visible and reconciled.
+- **Increment history:** Preserve effective-dated compensation versions for annual reviews and other changes, recording the actor, reason, and timestamp. Show previous and new CTC and the increment amount/percentage when currencies match. Future changes must not replace currently effective compensation early; reject duplicate effective dates and prevent concurrent edits from losing updates.
+- **Reporting:** Show headcount, annual CTC spend, median annual CTC, and breakdowns by country, department, and level using compensation effective on the reporting date. Keep original currency totals separate. For cross-currency reporting, use documented, dated reference exchange rates and label the reporting currency and rate assumptions; never sum mixed currencies directly. Historical compensation reporting does not imply historical department/headcount reconstruction.
+- **HR workflow (proposed defaults):** Authenticated HR access, validated CSV import with row-level errors, and CSV export of filtered results. Protect compensation endpoints and retain an audit trail for salary changes.
+
+## Quality and delivery
+Provide deterministic seed data for exactly 10,000 employees across multiple countries/currencies, including increment history. Use server-side pagination, indexed filters, and database aggregation so the UI does not load the whole workforce. Test compensation reconciliation, rounding, effective dates, increments, currency handling, authorization, and core API/UI workflows. Deliver setup instructions, deployment configuration, a working deployment, and a short video demo. Make incremental commits and retain architecture/trade-off notes and an honest record of AI assistance and human verification.
+
+## Deliberately excluded
+Payroll execution, tax calculations, statutory deductions, payslips, bank transfers, equity valuation, and benefits administration are excluded: this product manages agreed compensation, not country-specific payroll compliance. Performance review scoring and approval chains are excluded; HR records the resulting increment. Natural-language/AI reporting is deferred because explicit dashboards and filters satisfy the initial reporting needs with more predictable results. Live FX feeds and historical organization reconstruction are deferred to keep the first release reproducible and focused. Employee self-service and multi-organization tenancy are outside the single-organization HR persona.
+
+## Open delivery decisions
+Submission deadline, hosting provider/budget, and demo recording method remain to be selected. Authentication and CSV workflows above are proposed defaults, not yet explicitly confirmed by the stakeholder.
