@@ -31,3 +31,5 @@ Until clarified, retain the prototype's documented compensation assumptions. Loc
 ## Execution log
 
 Infrastructure: Ruby 3.4.7, Rails 8.1.4, PostgreSQL configuration and reusable test builders. No salary functionality copied at this stage.
+
+Domain slice: tests committed at `fd9f32d` before models/schema/services. Red command `bin/rails test test/models/compensation_test.rb`: 10 missing-User errors. Implementation reuses reviewed prototype domain code; it does not claim independent discovery. The complete domain suite is run before the implementation commit.
