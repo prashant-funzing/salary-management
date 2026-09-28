@@ -33,3 +33,9 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+/frontend/node_modules
+/public/app
+/playwright-report
+/test-results
+/frontend/test-results
+/frontend/playwright-report
