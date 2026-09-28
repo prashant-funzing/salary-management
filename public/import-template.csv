@@ -1,0 +1,2 @@
+employee_code,name,email,country,department,level,status,currency,annual_ctc,effective_on,reason,components
+NEW-001,Example Employee,example@acme.example,India,Engineering,L3,active,INR,1200000,2026-01-01,Initial offer,"{""Basic"":""480000"",""HRA"":""240000"",""Special Allowance"":""480000""}"

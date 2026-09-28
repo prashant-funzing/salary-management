@@ -57,4 +57,17 @@ class SessionsApiTest < ActionDispatch::IntegrationTest
     sign_in(@user)
   end
 
+  test "every private endpoint rejects an anonymous session without writes" do
+    employee = create_employee
+    routes = [ [ :get, "/api/employees" ], [ :get, "/api/employees/options" ], [ :get, "/api/employees/#{employee.id}" ],
+      [ :post, "/api/employees" ], [ :patch, "/api/employees/#{employee.id}" ],
+      [ :post, "/api/employees/#{employee.id}/compensations" ], [ :get, "/api/reports" ],
+      [ :get, "/api/transfers" ], [ :post, "/api/transfers" ] ]
+    assert_no_difference([ "Employee.count", "Compensation.count" ]) do
+      routes.each do |method, path|
+        public_send(method, path, as: :json)
+        assert_response :unauthorized
+      end
+    end
+  end
 end
