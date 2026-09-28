@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+# Never inherit a production/development URL for the disposable browser database.
+unset DATABASE_URL
+export RAILS_ENV=test
+export TEST_DATABASE=salary_management_tdd_browser_test
+export BROWSER_TEST=1
+bin/rails db:prepare
+bin/rails runner script/prepare_browser_test.rb
+exec bin/rails server -b 127.0.0.1 -p 3102 -P tmp/pids/browser-test.pid
