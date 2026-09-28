@@ -41,3 +41,5 @@ Salary/reporting slice: tests committed at `8ab8cfc`; red salary-create request 
 CSV slice: tests committed at `781768e`; red valid-import test raised missing `EmployeeCsv`. Implemented atomic imports with row errors, input limits, and escaped filtered exports. Full suite verified before commit.
 
 Seed slice: test commit `bb0e1a2`; red seed test expected 10,000 employees and got 0. Implemented the deterministic seed and verified counts, currency/component reconciliation, and preservation of HR changes on rerun. Full backend suite passes before commit.
+
+React sign-in slice: test commit `24362ed`; red browser test could not find the email field because no UI/root page existed. Implemented only sign-in/session restoration/sign-out (plus shared styling reused from the prototype). The browser test passes before commit.
