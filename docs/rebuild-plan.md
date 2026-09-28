@@ -35,3 +35,5 @@ Infrastructure: Ruby 3.4.7, Rails 8.1.4, PostgreSQL configuration and reusable t
 Domain slice: tests committed at `fd9f32d` before models/schema/services. Red command `bin/rails test test/models/compensation_test.rb`: 10 missing-User errors. Implementation reuses reviewed prototype domain code; it does not claim independent discovery. The complete domain suite is run before the implementation commit.
 
 Sessions/directory slice: test commit `6639ec0`; red pagination scenario failed at sign-in with HTTP 404 before routes/controllers existed. Added session authentication, CSRF handling, employee filtering/pagination/editing and validation. Full suite verified before the green commit.
+
+Salary/reporting slice: tests committed at `8ab8cfc`; red salary-create request returned 404 instead of 201. Added immutable salary recording with strict lock versions and exact per-currency reporting. Full suite verified before commit.
