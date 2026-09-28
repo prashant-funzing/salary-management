@@ -37,3 +37,5 @@ Domain slice: tests committed at `fd9f32d` before models/schema/services. Red co
 Sessions/directory slice: test commit `6639ec0`; red pagination scenario failed at sign-in with HTTP 404 before routes/controllers existed. Added session authentication, CSRF handling, employee filtering/pagination/editing and validation. Full suite verified before the green commit.
 
 Salary/reporting slice: tests committed at `8ab8cfc`; red salary-create request returned 404 instead of 201. Added immutable salary recording with strict lock versions and exact per-currency reporting. Full suite verified before commit.
+
+CSV slice: tests committed at `781768e`; red valid-import test raised missing `EmployeeCsv`. Implemented atomic imports with row errors, input limits, and escaped filtered exports. Full suite verified before commit.
