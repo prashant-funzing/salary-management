@@ -39,3 +39,5 @@ Sessions/directory slice: test commit `6639ec0`; red pagination scenario failed 
 Salary/reporting slice: tests committed at `8ab8cfc`; red salary-create request returned 404 instead of 201. Added immutable salary recording with strict lock versions and exact per-currency reporting. Full suite verified before commit.
 
 CSV slice: tests committed at `781768e`; red valid-import test raised missing `EmployeeCsv`. Implemented atomic imports with row errors, input limits, and escaped filtered exports. Full suite verified before commit.
+
+Seed slice: test commit `bb0e1a2`; red seed test expected 10,000 employees and got 0. Implemented the deterministic seed and verified counts, currency/component reconciliation, and preservation of HR changes on rerun. Full backend suite passes before commit.
