@@ -1,6 +1,6 @@
 # ACME People — salary management
 
-A Rails 8.1 / React application backed by PostgreSQL for an HR team managing 10,000 employees across countries. The implementation on `main` is a test-first second iteration using the original prototype as a reference; see the [TDD execution record](docs/tdd.md).
+A Rails 8.1 / React application backed by PostgreSQL for an HR team managing 10,000 employees across countries.
 
 ## Clone, set up, and run
 
@@ -149,7 +149,6 @@ These containers bind only to the local machine and disable HTTPS for local revi
 ## Artifacts and limits
 
 - [One-page requirements](docs/requirements.md)
-- [TDD execution record](docs/tdd.md)
 - [Recruiter clarification draft](docs/recruiter-questions.md)
 - [Architecture and trade-offs](docs/architecture.md)
 - [AI development record](docs/ai-development.md)

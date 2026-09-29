@@ -30,4 +30,4 @@ The browser suite manages its test server on port 3102 and only resets `salary_m
 
 Line/branch coverage reports loaded application files, not every possible input combination. The matrix does not claim exhaustive testing, full JavaScript branch coverage, every browser engine, load capacity, disaster recovery, or external service availability. Browser coverage uses Chromium. The concurrency test exercises the salary-write conflict, not a sustained load test. Human acceptance testing remains useful.
 
-See [the TDD record](tdd.md) for the distinction between retrospective coverage and the failing-regression/fix commits.
+Test coverage describes current verified behavior; it does not establish a test-first development history.

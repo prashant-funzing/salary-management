@@ -1,6 +1,6 @@
-# Rebuild verification — 2026-09-29
+# Application verification — 2026-09-29
 
-This record applies to the `tdd-rebuild` second iteration, not the prototype's original development order. [The TDD log](tdd.md) maps actual failing test executions to passing implementation commits.
+These are recorded application checks, not evidence of the order in which the software was developed.
 
 ## Checks completed
 
@@ -34,4 +34,4 @@ This smoke test assumes a freshly seeded dataset and only reads employees/salari
 
 ## Limits
 
-The tests are not a load test, cross-browser certification, backup/recovery exercise, or a substitute for human acceptance testing. A fresh Brakeman scan and hosted CI are not claimed in this rebuild record. The local Git branch must be published before reviewers can clone it. Local-only delivery still needs recruiter confirmation because the supplied brief requested hosting.
+The tests are not a load test, cross-browser certification, backup/recovery exercise, or a substitute for human acceptance testing. A fresh Brakeman scan and hosted CI are not claimed in this record. AWS EC2 deployment is planned; these results cover local execution.
