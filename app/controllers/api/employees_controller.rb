@@ -21,7 +21,7 @@ module Api
     def update
       employee = Employee.find(params[:id])
       attributes = employee_params
-      attributes[:lock_version] = RecordCompensation.parse_version(attributes.require(:lock_version))
+      attributes[:lock_version] = LockVersion.parse(attributes.require(:lock_version))
       employee.update!(attributes)
       render json: employee
     end
