@@ -1,15 +1,16 @@
 # ACME People — salary management
 
-A Rails 8.1 / React application backed by PostgreSQL for an HR team managing 10,000 employees across countries. This `tdd-rebuild` branch is a test-first second iteration using the original prototype as a reference; see the [TDD execution record](docs/tdd.md).
+A Rails 8.1 / React application backed by PostgreSQL for an HR team managing 10,000 employees across countries. The implementation on `main` is a test-first second iteration using the original prototype as a reference; see the [TDD execution record](docs/tdd.md).
 
 ## Clone, set up, and run
 
-Publish the `tdd-rebuild` branch before sharing these clone instructions with reviewers. The local branch alone is not available on GitHub.
+Choose the native setup below to develop and run tests, or use [Docker](#optional-local-containers) to review the application without installing Ruby, Node.js, or PostgreSQL locally. Commands use a macOS/Linux shell; on Windows, use WSL2 or Docker Desktop.
 
 Prerequisites:
 
 - Git and Ruby **3.4.7** (the version in `.ruby-version`), with Bundler installed.
 - Node.js **24** with npm.
+- Native build tools and PostgreSQL client headers if Bundler needs to compile gems (for example, Xcode Command Line Tools and `libpq` on macOS, or `build-essential`, `libpq-dev`, and `libyaml-dev` on Ubuntu).
 - PostgreSQL **16**, running and accepting connections on `127.0.0.1:5432`.
 - A PostgreSQL role that can create the development and test databases. The default role is your OS username. If your installation uses another role, export its connection settings before setup:
 
@@ -23,8 +24,10 @@ export PGPORT=5432
 Use the role/password configured on your own PostgreSQL installation; these are not application login credentials. If PostgreSQL uses local trust authentication, `PGPASSWORD` can be omitted. The application reads these environment variables directly; it does not automatically load a `.env` file.
 
 ```sh
-git clone --branch tdd-rebuild https://github.com/prashant-funzing/salary-management.git
+git clone --branch main https://github.com/prashant-funzing/salary-management.git
 cd salary-management
+# Use local development settings, not an inherited deployment database URL.
+unset DATABASE_URL RAILS_ENV TEST_DATABASE
 bin/setup
 bin/rails server -p 3100
 ```
@@ -84,7 +87,11 @@ Open **http://127.0.0.1:5173/app/** (or the port printed by Vite). Vite proxies 
 
 ## Verify
 
+Run these commands from the repository root after native setup. Tests require local Ruby/Node dependencies; the production Docker image does not include test tools.
+
 ```sh
+unset DATABASE_URL RAILS_ENV TEST_DATABASE APP_URL
+RAILS_ENV=test bin/rails db:prepare
 COVERAGE=1 bin/rails test
 bin/rubocop
 bin/brakeman --no-pager
@@ -94,7 +101,10 @@ npm audit --prefix frontend
 cd frontend
 npx playwright install chromium
 npm test
+cd ..
 ```
+
+On Linux, if Chromium reports missing system libraries, run `npx playwright install --with-deps chromium` from `frontend/` (installing system packages may require administrator access).
 
 Browser tests start their own Rails server on port 3102 and recreate synthetic records in the dedicated `salary_management_tdd_browser_test` database. The launcher explicitly removes `DATABASE_URL` and only clears that named database in test mode; it does not touch the development or Docker review databases. PostgreSQL must be running and the local role must have permission to create this test database. Do not run two browser suites concurrently against the same database.
 
@@ -104,17 +114,37 @@ Rails tests cover exact money rules, temporal history, simultaneous/stale writes
 
 ## Optional local containers
 
-The native setup above is the documented, verified path. [compose.yml](compose.yml) and [Dockerfile](Dockerfile) are optional local container tooling. They require a running Docker daemon and the environment variables `POSTGRES_PASSWORD`, `SECRET_KEY_BASE`, and `ADMIN_PASSWORD`. Generate a secret with `bin/rails secret`, then run `docker compose up --build` and open port 3100. Set `WEB_PORT` to use another port. PostgreSQL data is persisted in a named volume.
+Install Docker with the Compose v2 plugin (Docker Desktop includes both), and start its daemon. The image builds React and runs Rails with PostgreSQL in a separate container. No local Ruby, Node.js, or PostgreSQL installation is needed for this path.
 
-A local, ignored `.env.docker` file can supply these settings. To review this branch alongside another running stack, select a separate Compose project and port:
+Clone the repository as shown above, then run the following from its root. Create `.env.docker` once; preserve it for subsequent starts. The generated database password is hexadecimal so it is safe in the configured database URL.
 
 ```sh
-WEB_PORT=3300 docker compose -p salary_management_tdd --env-file .env.docker up --build -d
-docker compose -p salary_management_tdd --env-file .env.docker logs -f web
-docker compose -p salary_management_tdd --env-file .env.docker stop
+# Requires openssl, available on most macOS/Linux installations.
+(umask 077; cat > .env.docker <<EOF
+POSTGRES_PASSWORD=$(openssl rand -hex 24)
+SECRET_KEY_BASE=$(openssl rand -hex 64)
+ADMIN_EMAIL=hr@acme.example
+ADMIN_PASSWORD=AcmeDemo2026!
+WEB_PORT=3100
+EOF
+)
+docker compose --env-file .env.docker up --build -d
+docker compose --env-file .env.docker logs -f web
 ```
 
-The ignored file is not included in a clone; new users should provide the environment variables described above. Hosting and public deployment are outside the agreed delivery scope.
+Wait for Rails to report that it is listening on port 3000 inside the container, then open **http://localhost:3100**. The entrypoint prepares the database and Rails seeds a newly initialized database automatically. Sign in with the credentials in `.env.docker`. Ctrl+C exits log viewing without stopping the containers.
+
+To explicitly rerun the safe seed script, stop the application, or start it again:
+
+```sh
+docker compose --env-file .env.docker exec web bin/rails db:seed
+docker compose --env-file .env.docker stop
+docker compose --env-file .env.docker up -d
+```
+
+PostgreSQL data persists in a named volume. `docker compose down` retains it; adding `--volumes` deletes that data. Keep the same Compose project/directory and database password when restarting. If port 3100 is occupied, change `WEB_PORT` in `.env.docker`. The file is ignored by Git and is not included in a clone.
+
+These containers bind only to the local machine and disable HTTPS for local review. The sample admin password is for synthetic local data. AWS EC2 deployment and its HTTPS/secrets configuration are planned separately.
 
 ## Artifacts and limits
 
@@ -123,7 +153,7 @@ The ignored file is not included in a clone; new users should provide the enviro
 - [Recruiter clarification draft](docs/recruiter-questions.md)
 - [Architecture and trade-offs](docs/architecture.md)
 - [AI development record](docs/ai-development.md)
-- [Verification and performance](docs/verification.md)
+- [Recorded verification results](docs/verification.md)
 - [Demo walkthrough](docs/demo.md)
 - [UI screenshots](docs/screenshots/)
 
