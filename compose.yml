@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: salary
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: salary_management
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U salary -d salary_management"]
+      interval: 5s
+      retries: 10
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
+    environment:
+      DATABASE_URL: postgres://salary:${POSTGRES_PASSWORD}@db:5432/salary_management
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?Set SECRET_KEY_BASE}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-hr@acme.example}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      FORCE_SSL: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  postgres_data:
