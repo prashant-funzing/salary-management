@@ -7,30 +7,56 @@ class EmployeeCsv
 
   def self.import(content, user:)
     return Result.new(0, [ "File exceeds 5 MB" ]) if content.bytesize > MAX_BYTES
+
     table = CSV.parse(content.delete_prefix("\uFEFF"), headers: true)
     return Result.new(0, [ "Headers must be: #{HEADERS.join(',')}" ]) unless table.headers == HEADERS
     return Result.new(0, [ "File must contain 1–10000 rows" ]) unless table.size.between?(1, 10_000)
+
     errors = []
     Employee.transaction do
       table.each_with_index do |row, index|
         begin
-          Employee.transaction(requires_new: true) do
-            attributes = row.to_h
-            employee = Employee.create!(attributes.slice(*HEADERS.first(7)))
-            employee.compensations.create!(user: user, currency: attributes["currency"], annual_ctc: attributes["annual_ctc"], effective_on: attributes["effective_on"], reason: attributes["reason"], components: JSON.parse(attributes["components"].to_s))
-          end
+          import_row(row, user: user)
         rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique, JSON::ParserError => error
-          message = error.is_a?(ActiveRecord::RecordInvalid) ? error.record.errors.full_messages.join(", ") : "Duplicate employee or invalid components JSON"
-          errors << "Row #{index + 2}: #{message}"
+          errors << "Row #{index + 2}: #{import_error_message(error)}"
           break if errors.size >= 50
         end
       end
+
       raise ActiveRecord::Rollback if errors.any?
     end
+
     Result.new(errors.empty? ? table.size : 0, errors)
   rescue CSV::MalformedCSVError, ArgumentError
     Result.new(0, [ "Malformed CSV. Check quoting and UTF-8 encoding." ])
   end
+
+  def self.import_row(row, user:)
+    # Savepoints let later rows be validated after a database constraint failure.
+    Employee.transaction(requires_new: true) do
+      attributes = row.to_h
+      employee = Employee.create!(attributes.slice(*HEADERS.first(7)))
+
+      employee.compensations.create!(
+        user: user,
+        currency: attributes["currency"],
+        annual_ctc: attributes["annual_ctc"],
+        effective_on: attributes["effective_on"],
+        reason: attributes["reason"],
+        components: JSON.parse(attributes["components"].to_s)
+      )
+    end
+  end
+  private_class_method :import_row
+
+  def self.import_error_message(error)
+    if error.is_a?(ActiveRecord::RecordInvalid)
+      error.record.errors.full_messages.join(", ")
+    else
+      "Duplicate employee or invalid components JSON"
+    end
+  end
+  private_class_method :import_error_message
 
   def self.export(scope)
     CSV.generate do |csv|
