@@ -5,7 +5,7 @@ gem "rails", "~> 8.1.4"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # Use PostgreSQL for exact numeric compensation and relational integrity
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.7"
 gem "bcrypt", "~> 3.1"
 gem "csv"
 # Use the Puma web server [https://github.com/puma/puma]
